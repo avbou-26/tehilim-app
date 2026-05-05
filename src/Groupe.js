@@ -22,16 +22,16 @@ function PopupTehilim({ num, couleur, onClose }) {
   return (
     <div style={{
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-      background: 'rgba(0,0,0,0.75)',
+      background: 'rgba(0,0,0,0.85)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      zIndex: 3000, padding: '10px' // Z-index augmenté pour passer devant tout
+      zIndex: 9999, padding: '10px'
     }}>
       <div style={{
-        background: 'white', borderRadius: '16px',
-        padding: '20px', maxWidth: '650px', width: '100%',
-        maxHeight: '90vh', overflowY: 'auto'
+        background: 'white', borderRadius: '20px',
+        padding: '20px', maxWidth: '500px', width: '95%',
+        maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 10px 25px rgba(0,0,0,0.5)'
       }}>
-        <h2 style={{ color: couleur, textAlign: 'center', fontFamily: 'Arial', fontSize: '1.2rem' }}>
+        <h2 style={{ color: couleur, textAlign: 'center', fontSize: '1.4rem', margin: '0 0 15px' }}>
           פרק {num} — Chapitre {num}
         </h2>
         {loading ? (
@@ -39,20 +39,19 @@ function PopupTehilim({ num, couleur, onClose }) {
         ) : (
           <div style={{
             direction: 'rtl', textAlign: 'right',
-            fontSize: '1.3rem', lineHeight: '2', // Texte un peu plus gros pour mobile
+            fontSize: '1.4rem', lineHeight: '1.8',
             color: '#1a1a2e', padding: '15px',
-            background: '#f8f8ff', borderRadius: '10px',
-            fontFamily: 'Times New Roman, serif'
+            background: '#f8f8ff', borderRadius: '12px',
+            fontFamily: 'serif'
           }}>
             {texte.he}
           </div>
         )}
         <button onClick={onClose} style={{
-          marginTop: '16px', padding: '15px 40px', // Plus grand pour le clic
+          marginTop: '20px', padding: '16px',
           background: couleur, color: 'white',
-          border: 'none', borderRadius: '8px',
-          fontSize: '1rem', cursor: 'pointer',
-          display: 'block', margin: '16px auto 0',
+          border: 'none', borderRadius: '12px',
+          fontSize: '1.1rem', cursor: 'pointer',
           width: '100%', fontWeight: 'bold'
         }}>
           ✕ Fermer
@@ -103,7 +102,7 @@ export default function Groupe({ groupeId, nom, couleur }) {
 
   async function valider() {
     const choix = Object.keys(cochés).filter(k => cochés[k]);
-    if (choix.length === 0) { alert('Coche au moins un chapitre !'); return; }
+    if (choix.length === 0) return;
     if (!prenom.trim()) {
       setDemandePrenom(true);
       return;
@@ -115,151 +114,107 @@ export default function Groupe({ groupeId, nom, couleur }) {
   const nbCochés = Object.values(cochés).filter(Boolean).length;
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '12px', fontFamily: 'Arial', boxSizing: 'border-box' }}>
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '15px', boxSizing: 'border-box' }}>
 
-      {/* Header */}
-      <h1 style={{ color: couleur, textAlign: 'center', marginBottom: '4px', fontSize: 'clamp(1.3rem, 6vw, 2rem)' }}>
+      {/* Header compact pour laisser de la place aux boutons */}
+      <h1 style={{ color: couleur, textAlign: 'center', marginBottom: '5px', fontSize: '1.6rem' }}>
         📖 {nom}
       </h1>
-      <p style={{ textAlign: 'center', color: '#888', marginTop: 0, fontSize: '0.95rem' }}>
-        {pris}/150 chapitres pris
-      </p>
-
-      {/* Barre de progression */}
-      <div style={{ background: '#eee', borderRadius: '10px', height: '12px', margin: '12px 0 24px' }}>
-        <div style={{
-          width: `${(pris / 150) * 100}%`,
-          background: couleur, height: '100%',
-          borderRadius: '10px', transition: 'width 0.3s'
-        }} />
+      <div style={{ textAlign: 'center', marginBottom: '15px' }}>
+        <span style={{ color: '#666', fontSize: '0.9rem' }}>{pris} / 150 chapitres lus</span>
+        <div style={{ background: '#eee', borderRadius: '10px', height: '10px', marginTop: '5px' }}>
+          <div style={{ width: `${(pris / 150) * 100}%`, background: couleur, height: '100%', borderRadius: '10px', transition: '0.5s' }} />
+        </div>
       </div>
 
-      {/* Prénom + bouton prendre */}
-      <div style={{ display: 'flex', flexDirection: 'row', gap: '8px', marginBottom: '20px' }}>
+      {/* Zone d'action fixe ou bien visible sur mobile */}
+      <div style={{ 
+        display: 'flex', gap: '10px', marginBottom: '20px', 
+        position: 'sticky', top: '10px', zIndex: 100,
+        background: 'white', padding: '10px 0' 
+      }}>
         <input
           type="text"
-          placeholder="✍️ Prénom"
+          placeholder="Ton Prénom"
           value={prenom}
           onChange={e => setPrenom(e.target.value)}
           style={{
-            padding: '14px', borderRadius: '10px',
-            border: `2px solid ${couleur}`, fontSize: '1rem',
-            flex: '2', minWidth: '0' // minWidth 0 permet de ne pas casser le flex sur mobile
+            padding: '15px', borderRadius: '12px', border: `2px solid ${couleur}`,
+            fontSize: '1rem', flex: 1, minWidth: '0'
           }}
         />
         <button
           onClick={valider}
           disabled={nbCochés === 0}
           style={{
-            padding: '14px', borderRadius: '10px',
+            padding: '15px 20px', borderRadius: '12px',
             background: nbCochés > 0 ? couleur : '#ccc',
-            color: 'white', border: 'none',
-            fontSize: '1rem', cursor: nbCochés > 0 ? 'pointer' : 'not-allowed',
-            fontWeight: 'bold', flex: '1'
+            color: 'white', border: 'none', fontWeight: 'bold', fontSize: '1rem'
           }}
         >
-          {nbCochés > 0 ? `Prendre (${nbCochés})` : 'Prendre'}
+          Prendre {nbCochés > 0 && `(${nbCochés})`}
         </button>
       </div>
 
-      {/* Grille responsive */}
-      {loading ? (
-        <p style={{ textAlign: 'center' }}>Chargement...</p>
-      ) : (
-        <div style={{
-          display: 'grid',
-          // 2 colonnes sur mini écrans, 3 sur mobiles moyens, 5 sur ordi
-          gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))',
-          gap: '8px'
-        }}>
-          {Array.from({ length: 150 }, (_, i) => i + 1).map(num => {
-            const pritPar = chapitres[num];
-            const coché = cochés[num];
+      {/* Grille : on force 3 colonnes sur petit mobile, 4-5 sur plus grand */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(85px, 1fr))',
+        gap: '10px'
+      }}>
+        {Array.from({ length: 150 }, (_, i) => i + 1).map(num => {
+          const pritPar = chapitres[num];
+          const coché = cochés[num];
 
-            return (
-              <div key={num} style={{
-                borderRadius: '10px',
-                border: `2px solid ${pritPar ? couleur : coché ? couleur : '#e0e0e0'}`,
-                background: pritPar ? `${couleur}22` : coché ? `${couleur}11` : 'white',
-                padding: '10px 6px',
-                display: 'flex', flexDirection: 'column', gap: '4px' // Organisation verticale pour mobile
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  {/* Numéro */}
-                  <span
-                    onClick={() => setSelected(num)}
-                    style={{
-                      fontWeight: '900', color: couleur, cursor: 'pointer',
-                      fontSize: '1.1rem', textDecoration: 'underline',
-                      padding: '2px 4px'
-                    }}
-                  >
-                    {num}
-                  </span>
-
-                  {/* Case à cocher plus grande pour le doigt */}
-                  <div
-                    onClick={() => toggleCoché(num)}
-                    style={{
-                      width: '24px', height: '24px',
-                      borderRadius: '6px',
-                      border: `2px solid ${pritPar ? couleur : coché ? couleur : '#bbb'}`,
-                      background: pritPar ? couleur : coché ? couleur : 'white',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      cursor: pritPar ? 'not-allowed' : 'pointer'
-                    }}
-                  >
-                    {(pritPar || coché) && <span style={{ color: 'white', fontSize: '14px' }}>✓</span>}
-                  </div>
-                </div>
-
-                {/* Prénom en dessous du numéro pour plus de place */}
-                <div style={{
-                  fontSize: '0.75rem',
-                  color: pritPar ? '#333' : '#bbb',
-                  overflow: 'hidden', textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap', textAlign: 'center',
-                  fontWeight: pritPar ? 'bold' : 'normal',
-                  minHeight: '1rem'
-                }}>
-                  {pritPar || ''}
-                </div>
+          return (
+            <div 
+              key={num}
+              onClick={() => !pritPar && toggleCoché(num)}
+              style={{
+                borderRadius: '12px',
+                border: `2px solid ${pritPar ? couleur : coché ? couleur : '#eee'}`,
+                background: pritPar ? `${couleur}15` : coché ? `${couleur}30` : '#fdfdfd',
+                padding: '12px 5px',
+                textAlign: 'center',
+                position: 'relative',
+                minHeight: '60px',
+                display: 'flex', flexDirection: 'column', justifyContent: 'center'
+              }}
+            >
+              <div 
+                onClick={(e) => { e.stopPropagation(); setSelected(num); }}
+                style={{ fontWeight: 'bold', color: couleur, fontSize: '1.2rem', textDecoration: 'underline' }}
+              >
+                {num}
               </div>
-            );
-          })}
-        </div>
-      )}
+              <div style={{ fontSize: '0.7rem', color: '#444', marginTop: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {pritPar ? pritPar : coché ? 'SÉLECT.' : ''}
+              </div>
+              {coché && !pritPar && (
+                 <div style={{ position: 'absolute', top: '5px', right: '5px', color: couleur, fontSize: '0.8rem' }}>✓</div>
+              )}
+            </div>
+          );
+        })}
+      </div>
 
-      {/* Popups (inchangées mais avec z-index haut) */}
+      {/* Popup prénom */}
       {demandePrenom && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.8)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          zIndex: 4000, padding: '20px'
-        }}>
-          <div style={{
-            background: 'white', borderRadius: '16px',
-            padding: '25px', maxWidth: '320px', width: '100%',
-            textAlign: 'center'
-          }}>
-            <h3 style={{ color: couleur, marginTop: 0 }}>✍️ Ton prénom</h3>
-            <input
-              autoFocus
-              type="text"
-              placeholder="Entre ton prénom"
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000 }}>
+          <div style={{ background: 'white', padding: '25px', borderRadius: '20px', width: '80%', maxWidth: '300px' }}>
+            <h3 style={{ marginTop: 0, textAlign: 'center' }}>Ton prénom ?</h3>
+            <input 
+              autoFocus 
+              style={{ width: '100%', padding: '12px', boxSizing: 'border-box', marginBottom: '15px', borderRadius: '8px', border: '1px solid #ccc' }}
               value={prenomTemp}
               onChange={e => setPrenomTemp(e.target.value)}
-              style={{
-                padding: '12px', borderRadius: '8px',
-                border: `2px solid ${couleur}`, fontSize: '1rem',
-                width: '100%', boxSizing: 'border-box', marginBottom: '16px'
-              }}
             />
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button onClick={() => setDemandePrenom(false)} style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px' }}>Annuler</button>
-              <button onClick={() => prenomTemp.trim() && confirmerAvecPrenom(prenomTemp.trim())} style={{ flex: 1, padding: '12px', background: couleur, color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold' }}>OK</button>
-            </div>
+            <button 
+              onClick={() => prenomTemp.trim() && confirmerAvecPrenom(prenomTemp.trim())}
+              style={{ width: '100%', padding: '12px', background: couleur, color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold' }}
+            >
+              Valider
+            </button>
           </div>
         </div>
       )}
