@@ -24,7 +24,7 @@ function PopupTehilim({ num, couleur, onClose }) {
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
       background: 'rgba(0,0,0,0.75)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      zIndex: 1000, padding: '10px'
+      zIndex: 3000, padding: '10px' // Z-index augmenté pour passer devant tout
     }}>
       <div style={{
         background: 'white', borderRadius: '16px',
@@ -39,7 +39,7 @@ function PopupTehilim({ num, couleur, onClose }) {
         ) : (
           <div style={{
             direction: 'rtl', textAlign: 'right',
-            fontSize: '1.2rem', lineHeight: '2.2',
+            fontSize: '1.3rem', lineHeight: '2', // Texte un peu plus gros pour mobile
             color: '#1a1a2e', padding: '15px',
             background: '#f8f8ff', borderRadius: '10px',
             fontFamily: 'Times New Roman, serif'
@@ -48,12 +48,12 @@ function PopupTehilim({ num, couleur, onClose }) {
           </div>
         )}
         <button onClick={onClose} style={{
-          marginTop: '16px', padding: '12px 40px',
+          marginTop: '16px', padding: '15px 40px', // Plus grand pour le clic
           background: couleur, color: 'white',
           border: 'none', borderRadius: '8px',
           fontSize: '1rem', cursor: 'pointer',
           display: 'block', margin: '16px auto 0',
-          width: '100%'
+          width: '100%', fontWeight: 'bold'
         }}>
           ✕ Fermer
         </button>
@@ -115,60 +115,61 @@ export default function Groupe({ groupeId, nom, couleur }) {
   const nbCochés = Object.values(cochés).filter(Boolean).length;
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '16px', fontFamily: 'Arial', boxSizing: 'border-box' }}>
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '12px', fontFamily: 'Arial', boxSizing: 'border-box' }}>
 
       {/* Header */}
-      <h1 style={{ color: couleur, textAlign: 'center', marginBottom: '4px', fontSize: 'clamp(1.1rem, 4vw, 1.8rem)' }}>
+      <h1 style={{ color: couleur, textAlign: 'center', marginBottom: '4px', fontSize: 'clamp(1.3rem, 6vw, 2rem)' }}>
         📖 {nom}
       </h1>
-      <p style={{ textAlign: 'center', color: '#888', marginTop: 0, fontSize: '0.9rem' }}>
+      <p style={{ textAlign: 'center', color: '#888', marginTop: 0, fontSize: '0.95rem' }}>
         {pris}/150 chapitres pris
       </p>
 
       {/* Barre de progression */}
-      <div style={{ background: '#eee', borderRadius: '10px', height: '10px', margin: '8px 0 20px' }}>
+      <div style={{ background: '#eee', borderRadius: '10px', height: '12px', margin: '12px 0 24px' }}>
         <div style={{
           width: `${(pris / 150) * 100}%`,
-          background: couleur, height: '10px',
+          background: couleur, height: '100%',
           borderRadius: '10px', transition: 'width 0.3s'
         }} />
       </div>
 
       {/* Prénom + bouton prendre */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', flexDirection: 'row', gap: '8px', marginBottom: '20px' }}>
         <input
           type="text"
-          placeholder="✍️ Ton prénom"
+          placeholder="✍️ Prénom"
           value={prenom}
-          onChange={e => { setPrenom(e.target.value); }}
+          onChange={e => setPrenom(e.target.value)}
           style={{
-            padding: '12px 16px', borderRadius: '8px',
+            padding: '14px', borderRadius: '10px',
             border: `2px solid ${couleur}`, fontSize: '1rem',
-            flex: '1', minWidth: '160px', maxWidth: '250px'
+            flex: '2', minWidth: '0' // minWidth 0 permet de ne pas casser le flex sur mobile
           }}
         />
         <button
           onClick={valider}
           disabled={nbCochés === 0}
           style={{
-            padding: '12px 20px', borderRadius: '8px',
+            padding: '14px', borderRadius: '10px',
             background: nbCochés > 0 ? couleur : '#ccc',
             color: 'white', border: 'none',
             fontSize: '1rem', cursor: nbCochés > 0 ? 'pointer' : 'not-allowed',
-            fontWeight: 'bold', whiteSpace: 'nowrap'
+            fontWeight: 'bold', flex: '1'
           }}
         >
-          Prendre ({nbCochés})
+          {nbCochés > 0 ? `Prendre (${nbCochés})` : 'Prendre'}
         </button>
       </div>
 
-      {/* Grille 5 colonnes */}
+      {/* Grille responsive */}
       {loading ? (
         <p style={{ textAlign: 'center' }}>Chargement...</p>
       ) : (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(5, 1fr)',
+          // 2 colonnes sur mini écrans, 3 sur mobiles moyens, 5 sur ordi
+          gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))',
           gap: '8px'
         }}>
           {Array.from({ length: 150 }, (_, i) => i + 1).map(num => {
@@ -180,58 +181,48 @@ export default function Groupe({ groupeId, nom, couleur }) {
                 borderRadius: '10px',
                 border: `2px solid ${pritPar ? couleur : coché ? couleur : '#e0e0e0'}`,
                 background: pritPar ? `${couleur}22` : coché ? `${couleur}11` : 'white',
-                padding: '8px 6px',
-                transition: 'all 0.2s'
+                padding: '10px 6px',
+                display: 'flex', flexDirection: 'column', gap: '4px' // Organisation verticale pour mobile
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-
-                  {/* Numéro cliquable */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  {/* Numéro */}
                   <span
                     onClick={() => setSelected(num)}
                     style={{
-                      fontWeight: '900',
-                      color: couleur,
-                      cursor: 'pointer',
-                      fontSize: 'clamp(0.75rem, 2.5vw, 0.95rem)',
-                      textDecoration: 'underline',
-                      textDecorationThickness: '2px',
-                      minWidth: '22px',
-                      flexShrink: 0
+                      fontWeight: '900', color: couleur, cursor: 'pointer',
+                      fontSize: '1.1rem', textDecoration: 'underline',
+                      padding: '2px 4px'
                     }}
                   >
                     {num}
                   </span>
 
-                  {/* Case à cocher */}
+                  {/* Case à cocher plus grande pour le doigt */}
                   <div
                     onClick={() => toggleCoché(num)}
                     style={{
-                      width: '18px', height: '18px',
-                      borderRadius: '4px', flexShrink: 0,
+                      width: '24px', height: '24px',
+                      borderRadius: '6px',
                       border: `2px solid ${pritPar ? couleur : coché ? couleur : '#bbb'}`,
                       background: pritPar ? couleur : coché ? couleur : 'white',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      cursor: pritPar ? 'not-allowed' : 'pointer',
-                      transition: 'all 0.2s'
+                      cursor: pritPar ? 'not-allowed' : 'pointer'
                     }}
                   >
-                    {(pritPar || coché) && (
-                      <span style={{ color: 'white', fontSize: '11px', fontWeight: 'bold' }}>✓</span>
-                    )}
+                    {(pritPar || coché) && <span style={{ color: 'white', fontSize: '14px' }}>✓</span>}
                   </div>
+                </div>
 
-                  {/* Prénom */}
-                  <span style={{
-                    fontSize: 'clamp(0.5rem, 1.8vw, 0.65rem)',
-                    color: pritPar ? couleur : '#bbb',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    flex: 1
-                  }}>
-                    {pritPar || ''}
-                  </span>
-
+                {/* Prénom en dessous du numéro pour plus de place */}
+                <div style={{
+                  fontSize: '0.75rem',
+                  color: pritPar ? '#333' : '#bbb',
+                  overflow: 'hidden', textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap', textAlign: 'center',
+                  fontWeight: pritPar ? 'bold' : 'normal',
+                  minHeight: '1rem'
+                }}>
+                  {pritPar || ''}
                 </div>
               </div>
             );
@@ -239,63 +230,41 @@ export default function Groupe({ groupeId, nom, couleur }) {
         </div>
       )}
 
-      {/* Popup demande prénom */}
+      {/* Popups (inchangées mais avec z-index haut) */}
       {demandePrenom && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.75)',
+          background: 'rgba(0,0,0,0.8)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          zIndex: 2000, padding: '20px'
+          zIndex: 4000, padding: '20px'
         }}>
           <div style={{
             background: 'white', borderRadius: '16px',
-            padding: '30px', maxWidth: '350px', width: '100%',
+            padding: '25px', maxWidth: '320px', width: '100%',
             textAlign: 'center'
           }}>
-            <h3 style={{ color: couleur, marginBottom: '16px' }}>✍️ Ton prénom</h3>
+            <h3 style={{ color: couleur, marginTop: 0 }}>✍️ Ton prénom</h3>
             <input
               autoFocus
               type="text"
               placeholder="Entre ton prénom"
               value={prenomTemp}
               onChange={e => setPrenomTemp(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter' && prenomTemp.trim()) confirmerAvecPrenom(prenomTemp.trim()); }}
               style={{
-                padding: '12px 16px', borderRadius: '8px',
+                padding: '12px', borderRadius: '8px',
                 border: `2px solid ${couleur}`, fontSize: '1rem',
                 width: '100%', boxSizing: 'border-box', marginBottom: '16px'
               }}
             />
             <div style={{ display: 'flex', gap: '10px' }}>
-              <button
-                onClick={() => { setDemandePrenom(false); setPrenomTemp(''); }}
-                style={{
-                  flex: 1, padding: '12px', borderRadius: '8px',
-                  background: '#eee', border: 'none',
-                  fontSize: '1rem', cursor: 'pointer'
-                }}
-              >
-                Annuler
-              </button>
-              <button
-                onClick={() => { if (prenomTemp.trim()) confirmerAvecPrenom(prenomTemp.trim()); }}
-                style={{
-                  flex: 1, padding: '12px', borderRadius: '8px',
-                  background: couleur, color: 'white', border: 'none',
-                  fontSize: '1rem', cursor: 'pointer', fontWeight: 'bold'
-                }}
-              >
-                Valider ✓
-              </button>
+              <button onClick={() => setDemandePrenom(false)} style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px' }}>Annuler</button>
+              <button onClick={() => prenomTemp.trim() && confirmerAvecPrenom(prenomTemp.trim())} style={{ flex: 1, padding: '12px', background: couleur, color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold' }}>OK</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Popup tehilim */}
-      {selected && (
-        <PopupTehilim num={selected} couleur={couleur} onClose={() => setSelected(null)} />
-      )}
+      {selected && <PopupTehilim num={selected} couleur={couleur} onClose={() => setSelected(null)} />}
     </div>
   );
 }
