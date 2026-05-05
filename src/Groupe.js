@@ -65,10 +65,12 @@ function PopupTehilim({ num, couleur, onClose }) {
 export default function Groupe({ groupeId, nom, couleur }) {
   const [chapitres, setChapitres] = useState({});
   const [prenom, setPrenom] = useState('');
+  const [prenomTemp, setPrenomTemp] = useState('');
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
   const [cochés, setCochés] = useState({});
   const [validé, setValidé] = useState(false);
+  const [demandePrenom, setDemandePrenom] = useState(false);
 
   const docId = `${groupeId}_${getTodayKey()}`;
 
@@ -88,18 +90,28 @@ export default function Groupe({ groupeId, nom, couleur }) {
     setCochés(prev => ({ ...prev, [num]: !prev[num] }));
   }
 
-  async function valider() {
-    if (!prenom.trim()) { alert('Entre ton prénom d\'abord !'); return; }
+  async function confirmerAvecPrenom(p) {
     const choix = Object.keys(cochés).filter(k => cochés[k]);
-    if (choix.length === 0) { alert('Coche au moins un chapitre !'); return; }
-
     const ref = doc(db, 'lectures', docId);
     const snap = await getDoc(ref);
     const data = snap.exists() ? snap.data().chapitres : {};
-    choix.forEach(num => { if (!data[num]) data[num] = prenom.trim(); });
+    choix.forEach(num => { if (!data[num]) data[num] = p; });
     await setDoc(ref, { chapitres: data }, { merge: false });
+    setPrenom(p);
     setValidé(true);
     setCochés({});
+    setDemandePrenom(false);
+    setPrenomTemp('');
+  }
+
+  async function valider() {
+    const choix = Object.keys(cochés).filter(k => cochés[k]);
+    if (choix.length === 0) { alert('Coche au moins un chapitre !'); return; }
+    if (!prenom.trim()) {
+      setDemandePrenom(true);
+      return;
+    }
+    await confirmerAvecPrenom(prenom.trim());
   }
 
   const pris = Object.keys(chapitres).length;
@@ -125,28 +137,17 @@ export default function Groupe({ groupeId, nom, couleur }) {
         }} />
       </div>
 
-      {/* Prénom + bouton */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
-        <input
-          type="text"
-          placeholder="✍️ Ton prénom"
-          value={prenom}
-          onChange={e => { setPrenom(e.target.value); setValidé(false); }}
-          style={{
-            padding: '12px 16px', borderRadius: '8px',
-            border: `2px solid ${couleur}`, fontSize: '1rem',
-            flex: '1', minWidth: '160px', maxWidth: '250px'
-          }}
-        />
+      {/* Bouton prendre */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
         <button
           onClick={valider}
           disabled={nbCochés === 0 || validé}
           style={{
-            padding: '12px 20px', borderRadius: '8px',
+            padding: '12px 32px', borderRadius: '8px',
             background: nbCochés > 0 && !validé ? couleur : '#ccc',
             color: 'white', border: 'none',
             fontSize: '1rem', cursor: nbCochés > 0 && !validé ? 'pointer' : 'not-allowed',
-            fontWeight: 'bold', whiteSpace: 'nowrap'
+            fontWeight: 'bold'
           }}
         >
           {validé ? '✅ Validé !' : `Prendre (${nbCochés})`}
@@ -174,7 +175,6 @@ export default function Groupe({ groupeId, nom, couleur }) {
                 padding: '8px 6px',
                 transition: 'all 0.2s'
               }}>
-                {/* Ligne : numéro + case + prénom */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
 
                   {/* Numéro cliquable */}
@@ -231,6 +231,60 @@ export default function Groupe({ groupeId, nom, couleur }) {
         </div>
       )}
 
+      {/* Popup demande prénom */}
+      {demandePrenom && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.75)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 2000, padding: '20px'
+        }}>
+          <div style={{
+            background: 'white', borderRadius: '16px',
+            padding: '30px', maxWidth: '350px', width: '100%',
+            textAlign: 'center'
+          }}>
+            <h3 style={{ color: couleur, marginBottom: '16px' }}>✍️ Ton prénom</h3>
+            <input
+              autoFocus
+              type="text"
+              placeholder="Entre ton prénom"
+              value={prenomTemp}
+              onChange={e => setPrenomTemp(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter' && prenomTemp.trim()) confirmerAvecPrenom(prenomTemp.trim()); }}
+              style={{
+                padding: '12px 16px', borderRadius: '8px',
+                border: `2px solid ${couleur}`, fontSize: '1rem',
+                width: '100%', boxSizing: 'border-box', marginBottom: '16px'
+              }}
+            />
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={() => { setDemandePrenom(false); setPrenomTemp(''); }}
+                style={{
+                  flex: 1, padding: '12px', borderRadius: '8px',
+                  background: '#eee', border: 'none',
+                  fontSize: '1rem', cursor: 'pointer'
+                }}
+              >
+                Annuler
+              </button>
+              <button
+                onClick={() => { if (prenomTemp.trim()) confirmerAvecPrenom(prenomTemp.trim()); }}
+                style={{
+                  flex: 1, padding: '12px', borderRadius: '8px',
+                  background: couleur, color: 'white', border: 'none',
+                  fontSize: '1rem', cursor: 'pointer', fontWeight: 'bold'
+                }}
+              >
+                Valider ✓
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Popup tehilim */}
       {selected && (
         <PopupTehilim num={selected} couleur={couleur} onClose={() => setSelected(null)} />
       )}
