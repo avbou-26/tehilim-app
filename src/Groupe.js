@@ -3,12 +3,6 @@ import { db } from './firebase';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import { getTehilim } from './tehilimTextes';
 
-const TEHILIM_FR = {
-  1: "Heureux l'homme qui ne marche pas selon le conseil des méchants...",
-  2: "Pourquoi les nations s'agitent-elles, et les peuples méditent-ils des choses vaines ?",
-  3: "Seigneur, que mes ennemis sont nombreux ! Beaucoup s'élèvent contre moi.",
-  // ... les 150 chapitres
-};
 
 function getTodayKey() {
   const d = new Date();
