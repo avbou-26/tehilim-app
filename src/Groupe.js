@@ -28,11 +28,10 @@ function PopupTehilim({ num, couleur, onClose }) {
     }}>
       <div style={{
         background: 'white', borderRadius: '16px',
-        padding: '16px', maxWidth: '650px', width: '100%',
-        maxHeight: '90vh', overflowY: 'auto',
-        boxSizing: 'border-box'
+        padding: '20px', maxWidth: '650px', width: '100%',
+        maxHeight: '90vh', overflowY: 'auto'
       }}>
-        <h2 style={{ color: couleur, textAlign: 'center', fontFamily: 'Arial', fontSize: 'clamp(1rem, 3vw, 1.2rem)' }}>
+        <h2 style={{ color: couleur, textAlign: 'center', fontFamily: 'Arial', fontSize: '1.2rem' }}>
           פרק {num} — Chapitre {num}
         </h2>
         {loading ? (
@@ -40,23 +39,21 @@ function PopupTehilim({ num, couleur, onClose }) {
         ) : (
           <div style={{
             direction: 'rtl', textAlign: 'right',
-            fontSize: 'clamp(0.9rem, 3.5vw, 1.2rem)',
-            lineHeight: '2',
-            color: '#1a1a2e', padding: '12px',
+            fontSize: '1.2rem', lineHeight: '2.2',
+            color: '#1a1a2e', padding: '15px',
             background: '#f8f8ff', borderRadius: '10px',
-            fontFamily: 'Times New Roman, serif',
-            wordBreak: 'break-word'
+            fontFamily: 'Times New Roman, serif'
           }}>
             {texte.he}
           </div>
         )}
         <button onClick={onClose} style={{
-          marginTop: '16px', padding: '12px',
+          marginTop: '16px', padding: '12px 40px',
           background: couleur, color: 'white',
           border: 'none', borderRadius: '8px',
           fontSize: '1rem', cursor: 'pointer',
-          display: 'block', width: '100%',
-          boxSizing: 'border-box'
+          display: 'block', margin: '16px auto 0',
+          width: '100%'
         }}>
           ✕ Fermer
         </button>
@@ -118,22 +115,18 @@ export default function Groupe({ groupeId, nom, couleur }) {
   const nbCochés = Object.values(cochés).filter(Boolean).length;
 
   return (
-    <div style={{
-      maxWidth: '800px', margin: '0 auto',
-      padding: '12px', fontFamily: 'Arial',
-      boxSizing: 'border-box', width: '100%'
-    }}>
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '16px', fontFamily: 'Arial', boxSizing: 'border-box' }}>
 
       {/* Header */}
-      <h1 style={{ color: couleur, textAlign: 'center', marginBottom: '4px', fontSize: 'clamp(1rem, 4vw, 1.8rem)' }}>
+      <h1 style={{ color: couleur, textAlign: 'center', marginBottom: '4px', fontSize: 'clamp(1.1rem, 4vw, 1.8rem)' }}>
         📖 {nom}
       </h1>
-      <p style={{ textAlign: 'center', color: '#888', marginTop: 0, fontSize: 'clamp(0.8rem, 2.5vw, 0.9rem)' }}>
+      <p style={{ textAlign: 'center', color: '#888', marginTop: 0, fontSize: '0.9rem' }}>
         {pris}/150 chapitres pris
       </p>
 
       {/* Barre de progression */}
-      <div style={{ background: '#eee', borderRadius: '10px', height: '10px', margin: '8px 0 16px' }}>
+      <div style={{ background: '#eee', borderRadius: '10px', height: '10px', margin: '8px 0 20px' }}>
         <div style={{
           width: `${(pris / 150) * 100}%`,
           background: couleur, height: '10px',
@@ -142,32 +135,26 @@ export default function Groupe({ groupeId, nom, couleur }) {
       </div>
 
       {/* Prénom + bouton prendre */}
-      <div style={{
-        display: 'flex', justifyContent: 'center',
-        gap: '8px', marginBottom: '16px', flexWrap: 'wrap'
-      }}>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
         <input
           type="text"
           placeholder="✍️ Ton prénom"
           value={prenom}
-          onChange={e => setPrenom(e.target.value)}
+          onChange={e => { setPrenom(e.target.value); }}
           style={{
-            padding: '10px 14px', borderRadius: '8px',
-            border: `2px solid ${couleur}`,
-            fontSize: 'clamp(0.9rem, 3vw, 1rem)',
-            flex: '1', minWidth: '140px', maxWidth: '220px',
-            boxSizing: 'border-box'
+            padding: '12px 16px', borderRadius: '8px',
+            border: `2px solid ${couleur}`, fontSize: '1rem',
+            flex: '1', minWidth: '160px', maxWidth: '250px'
           }}
         />
         <button
           onClick={valider}
           disabled={nbCochés === 0}
           style={{
-            padding: '10px 18px', borderRadius: '8px',
+            padding: '12px 20px', borderRadius: '8px',
             background: nbCochés > 0 ? couleur : '#ccc',
             color: 'white', border: 'none',
-            fontSize: 'clamp(0.9rem, 3vw, 1rem)',
-            cursor: nbCochés > 0 ? 'pointer' : 'not-allowed',
+            fontSize: '1rem', cursor: nbCochés > 0 ? 'pointer' : 'not-allowed',
             fontWeight: 'bold', whiteSpace: 'nowrap'
           }}
         >
@@ -175,14 +162,14 @@ export default function Groupe({ groupeId, nom, couleur }) {
         </button>
       </div>
 
-      {/* Grille responsive */}
+      {/* Grille 5 colonnes */}
       {loading ? (
         <p style={{ textAlign: 'center' }}>Chargement...</p>
       ) : (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(65px, 1fr))',
-          gap: '6px'
+          gridTemplateColumns: 'repeat(5, 1fr)',
+          gap: '8px'
         }}>
           {Array.from({ length: 150 }, (_, i) => i + 1).map(num => {
             const pritPar = chapitres[num];
@@ -190,14 +177,13 @@ export default function Groupe({ groupeId, nom, couleur }) {
 
             return (
               <div key={num} style={{
-                borderRadius: '8px',
+                borderRadius: '10px',
                 border: `2px solid ${pritPar ? couleur : coché ? couleur : '#e0e0e0'}`,
                 background: pritPar ? `${couleur}22` : coché ? `${couleur}11` : 'white',
-                padding: '6px 4px',
-                transition: 'all 0.2s',
-                boxSizing: 'border-box'
+                padding: '8px 6px',
+                transition: 'all 0.2s'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
 
                   {/* Numéro cliquable */}
                   <span
@@ -206,10 +192,10 @@ export default function Groupe({ groupeId, nom, couleur }) {
                       fontWeight: '900',
                       color: couleur,
                       cursor: 'pointer',
-                      fontSize: 'clamp(0.7rem, 2.5vw, 0.95rem)',
+                      fontSize: 'clamp(0.75rem, 2.5vw, 0.95rem)',
                       textDecoration: 'underline',
                       textDecorationThickness: '2px',
-                      minWidth: '20px',
+                      minWidth: '22px',
                       flexShrink: 0
                     }}
                   >
@@ -220,8 +206,8 @@ export default function Groupe({ groupeId, nom, couleur }) {
                   <div
                     onClick={() => toggleCoché(num)}
                     style={{
-                      width: '16px', height: '16px',
-                      borderRadius: '3px', flexShrink: 0,
+                      width: '18px', height: '18px',
+                      borderRadius: '4px', flexShrink: 0,
                       border: `2px solid ${pritPar ? couleur : coché ? couleur : '#bbb'}`,
                       background: pritPar ? couleur : coché ? couleur : 'white',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -230,13 +216,13 @@ export default function Groupe({ groupeId, nom, couleur }) {
                     }}
                   >
                     {(pritPar || coché) && (
-                      <span style={{ color: 'white', fontSize: '10px', fontWeight: 'bold' }}>✓</span>
+                      <span style={{ color: 'white', fontSize: '11px', fontWeight: 'bold' }}>✓</span>
                     )}
                   </div>
 
                   {/* Prénom */}
                   <span style={{
-                    fontSize: 'clamp(0.45rem, 1.5vw, 0.6rem)',
+                    fontSize: 'clamp(0.5rem, 1.8vw, 0.65rem)',
                     color: pritPar ? couleur : '#bbb',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -263,12 +249,10 @@ export default function Groupe({ groupeId, nom, couleur }) {
         }}>
           <div style={{
             background: 'white', borderRadius: '16px',
-            padding: '24px', maxWidth: '350px', width: '100%',
-            textAlign: 'center', boxSizing: 'border-box'
+            padding: '30px', maxWidth: '350px', width: '100%',
+            textAlign: 'center'
           }}>
-            <h3 style={{ color: couleur, marginBottom: '16px', fontSize: 'clamp(1rem, 3vw, 1.2rem)' }}>
-              ✍️ Ton prénom
-            </h3>
+            <h3 style={{ color: couleur, marginBottom: '16px' }}>✍️ Ton prénom</h3>
             <input
               autoFocus
               type="text"
@@ -277,7 +261,7 @@ export default function Groupe({ groupeId, nom, couleur }) {
               onChange={e => setPrenomTemp(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && prenomTemp.trim()) confirmerAvecPrenom(prenomTemp.trim()); }}
               style={{
-                padding: '12px', borderRadius: '8px',
+                padding: '12px 16px', borderRadius: '8px',
                 border: `2px solid ${couleur}`, fontSize: '1rem',
                 width: '100%', boxSizing: 'border-box', marginBottom: '16px'
               }}
