@@ -3,13 +3,13 @@ import { db } from './firebase';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import { getTehilim } from './tehilimTextes';
 
-
 function getTodayKey() {
   const d = new Date();
   return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
 }
+
 function PopupTehilim({ num, couleur, onClose }) {
-  const [texte, setTexte] = useState({ he: '', fr: '' });
+  const [texte, setTexte] = useState({ he: '' });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,200 +21,208 @@ function PopupTehilim({ num, couleur, onClose }) {
 
   return (
     <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
+      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
       background: 'rgba(0,0,0,0.75)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 1000, padding: '10px'
     }}>
       <div style={{
-        background: 'white',
-        borderRadius: '16px',
-        padding: '30px',
-        maxWidth: '650px',
-        width: '92%',
-        maxHeight: '85vh',
-        overflowY: 'auto'
+        background: 'white', borderRadius: '16px',
+        padding: '20px', maxWidth: '650px', width: '100%',
+        maxHeight: '90vh', overflowY: 'auto'
       }}>
-        
-        <h2 style={{ color: couleur, textAlign: 'center' }}>
+        <h2 style={{ color: couleur, textAlign: 'center', fontFamily: 'Arial', fontSize: '1.2rem' }}>
           פרק {num} — Chapitre {num}
         </h2>
-
         {loading ? (
           <p style={{ textAlign: 'center' }}>Chargement...</p>
         ) : (
-          <>
-            
-            {/* Hébreu */}
-            <div
-              style={{
-                direction: 'rtl',
-                textAlign: 'right',
-                fontSize: '22px',
-                lineHeight: '2',
-                marginBottom: '25px'
-              }}
-              dangerouslySetInnerHTML={{ __html: texte.he }}
-            />
-
-            {/* Traduction */}
-            <div
-              style={{
-                lineHeight: '1.8',
-                fontSize: '16px'
-              }}
-              dangerouslySetInnerHTML={{ __html: texte.fr }}
-            />
-
-          </>
+          <div style={{
+            direction: 'rtl', textAlign: 'right',
+            fontSize: '1.2rem', lineHeight: '2.2',
+            color: '#1a1a2e', padding: '15px',
+            background: '#f8f8ff', borderRadius: '10px',
+            fontFamily: 'Times New Roman, serif'
+          }}>
+            {texte.he}
+          </div>
         )}
-
-        <button
-          onClick={onClose}
-          style={{
-            marginTop: '20px',
-            padding: '10px 25px',
-            background: couleur,
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer'
-          }}
-        >
-          Fermer
+        <button onClick={onClose} style={{
+          marginTop: '16px', padding: '12px 40px',
+          background: couleur, color: 'white',
+          border: 'none', borderRadius: '8px',
+          fontSize: '1rem', cursor: 'pointer',
+          display: 'block', margin: '16px auto 0',
+          width: '100%'
+        }}>
+          ✕ Fermer
         </button>
-
       </div>
     </div>
   );
 }
+
 export default function Groupe({ groupeId, nom, couleur }) {
   const [chapitres, setChapitres] = useState({});
   const [prenom, setPrenom] = useState('');
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [cochés, setCochés] = useState({});
+  const [validé, setValidé] = useState(false);
 
   const docId = `${groupeId}_${getTodayKey()}`;
 
   useEffect(() => {
     const ref = doc(db, 'lectures', docId);
     const unsub = onSnapshot(ref, (snap) => {
-      if (snap.exists()) {
-        setChapitres(snap.data().chapitres || {});
-      } else {
-        setChapitres({});
-      }
+      if (snap.exists()) setChapitres(snap.data().chapitres || {});
+      else setChapitres({});
       setLoading(false);
     });
     return () => unsub();
   }, [docId]);
 
-  async function prendreChapitre(num) {
-    if (!prenom.trim()) {
-      alert('Entre ton prénom d\'abord !');
-      return;
-    }
+  function toggleCoché(num) {
+    if (validé) return;
     if (chapitres[num]) return;
+    setCochés(prev => ({ ...prev, [num]: !prev[num] }));
+  }
+
+  async function valider() {
+    if (!prenom.trim()) { alert('Entre ton prénom d\'abord !'); return; }
+    const choix = Object.keys(cochés).filter(k => cochés[k]);
+    if (choix.length === 0) { alert('Coche au moins un chapitre !'); return; }
 
     const ref = doc(db, 'lectures', docId);
     const snap = await getDoc(ref);
     const data = snap.exists() ? snap.data().chapitres : {};
-    if (data[num]) return;
-
-    data[num] = prenom.trim();
-    await setDoc(ref, { chapitres: data }, { merge: true });
+    choix.forEach(num => { if (!data[num]) data[num] = prenom.trim(); });
+    await setDoc(ref, { chapitres: data }, { merge: false });
+    setValidé(true);
+    setCochés({});
   }
 
   const pris = Object.keys(chapitres).length;
+  const nbCochés = Object.values(cochés).filter(Boolean).length;
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px', fontFamily: 'Arial' }}>
-      <h1 style={{ color: couleur, textAlign: 'center' }}>📖 {nom}</h1>
-      <p style={{ textAlign: 'center', color: '#666' }}>
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '16px', fontFamily: 'Arial', boxSizing: 'border-box' }}>
+
+      {/* Header */}
+      <h1 style={{ color: couleur, textAlign: 'center', marginBottom: '4px', fontSize: 'clamp(1.2rem, 4vw, 1.8rem)' }}>
+        📖 {nom}
+      </h1>
+      <p style={{ textAlign: 'center', color: '#888', marginTop: 0, fontSize: '0.9rem' }}>
         {pris}/150 chapitres pris
       </p>
 
       {/* Barre de progression */}
-      <div style={{ background: '#eee', borderRadius: '10px', height: '12px', margin: '10px 0 20px' }}>
+      <div style={{ background: '#eee', borderRadius: '10px', height: '10px', margin: '8px 0 20px' }}>
         <div style={{
-          width: `${(pris/150)*100}%`,
-          background: couleur,
-          height: '12px',
-          borderRadius: '10px',
-          transition: 'width 0.3s'
+          width: `${(pris / 150) * 100}%`,
+          background: couleur, height: '10px',
+          borderRadius: '10px', transition: 'width 0.3s'
         }} />
       </div>
 
-      {/* Prénom */}
-      <div style={{ textAlign: 'center', marginBottom: '25px' }}>
+      {/* Prénom + bouton */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
         <input
           type="text"
-          placeholder="Entre ton prénom"
+          placeholder="✍️ Ton prénom"
           value={prenom}
-          onChange={e => setPrenom(e.target.value)}
+          onChange={e => { setPrenom(e.target.value); setValidé(false); }}
           style={{
-            padding: '10px 20px',
-            borderRadius: '8px',
-            border: `2px solid ${couleur}`,
-            fontSize: '1rem',
-            width: '250px'
+            padding: '12px 16px', borderRadius: '8px',
+            border: `2px solid ${couleur}`, fontSize: '1rem',
+            flex: '1', minWidth: '160px', maxWidth: '250px'
           }}
         />
+        <button
+          onClick={valider}
+          disabled={nbCochés === 0 || validé}
+          style={{
+            padding: '12px 20px', borderRadius: '8px',
+            background: nbCochés > 0 && !validé ? couleur : '#ccc',
+            color: 'white', border: 'none',
+            fontSize: '1rem', cursor: nbCochés > 0 && !validé ? 'pointer' : 'not-allowed',
+            fontWeight: 'bold', whiteSpace: 'nowrap'
+          }}
+        >
+          {validé ? '✅ Validé !' : `Prendre (${nbCochés})`}
+        </button>
       </div>
 
-      {/* Grille des chapitres */}
+      {/* Grille responsive */}
       {loading ? (
         <p style={{ textAlign: 'center' }}>Chargement...</p>
       ) : (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(70px, 1fr))',
+          gridTemplateColumns: 'repeat(5, 1fr)',
           gap: '8px'
         }}>
           {Array.from({ length: 150 }, (_, i) => i + 1).map(num => {
-            const prit = chapitres[num];
+            const pritPar = chapitres[num];
+            const coché = cochés[num];
+
             return (
-              <div
-                key={num}
-                onClick={() => {
-                  if (!prit) prendreChapitre(num);
-                  else setSelected(num);
-                }}
-                style={{
-                  padding: '8px 4px',
-                  borderRadius: '8px',
-                  textAlign: 'center',
-                  cursor: prit ? 'default' : 'pointer',
-                  background: prit ? couleur : '#f0f0f0',
-                  color: prit ? 'white' : '#333',
-                  fontSize: '0.8rem',
-                  fontWeight: 'bold',
-                  border: `2px solid ${prit ? couleur : '#ddd'}`,
-                  transition: 'all 0.2s'
-                }}
-              >
-                <div>{num}</div>
-                {prit && <div style={{ fontSize: '0.65rem', marginTop: '2px' }}>{prit}</div>}
+              <div key={num} style={{
+                borderRadius: '10px',
+                border: `2px solid ${pritPar ? couleur : coché ? couleur : '#e0e0e0'}`,
+                background: pritPar ? `${couleur}22` : coché ? `${couleur}11` : 'white',
+                padding: '8px 4px',
+                textAlign: 'center',
+                transition: 'all 0.2s'
+              }}>
+                {/* Numéro cliquable */}
+                <div
+                  onClick={() => setSelected(num)}
+                  style={{
+                    fontWeight: 'bold', color: couleur,
+                    cursor: 'pointer', fontSize: 'clamp(0.8rem, 2.5vw, 1rem)',
+                    textDecoration: 'underline', marginBottom: '5px'
+                  }}
+                >
+                  {num}
+                </div>
+
+                {/* Case à cocher */}
+                <div
+                  onClick={() => toggleCoché(num)}
+                  style={{
+                    width: '22px', height: '22px',
+                    borderRadius: '4px', margin: '0 auto 5px',
+                    border: `2px solid ${pritPar ? couleur : coché ? couleur : '#bbb'}`,
+                    background: pritPar ? couleur : coché ? couleur : 'white',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: pritPar ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {(pritPar || coché) && (
+                    <span style={{ color: 'white', fontSize: '13px', fontWeight: 'bold' }}>✓</span>
+                  )}
+                </div>
+
+                {/* Prénom */}
+                <div style={{
+                  fontSize: 'clamp(0.55rem, 1.8vw, 0.7rem)',
+                  color: pritPar ? couleur : '#bbb',
+                  minHeight: '12px',
+                  wordBreak: 'break-word'
+                }}>
+                  {pritPar || ''}
+                </div>
               </div>
             );
           })}
         </div>
       )}
 
-      {/* Popup lecture */}
       {selected && (
-  <PopupTehilim
-    num={selected}
-    couleur={couleur}
-    onClose={() => setSelected(null)}
-  />
- )}
+        <PopupTehilim num={selected} couleur={couleur} onClose={() => setSelected(null)} />
+      )}
     </div>
   );
 }
