@@ -152,16 +152,16 @@ export default function Groupe({ groupeId, nom, couleur }) {
         />
         <button
           onClick={valider}
-          disabled={nbCochés === 0 || validé}
+          disabled={nbCochés === 0}
           style={{
-            padding: '12px 20px', borderRadius: '8px',
-            background: nbCochés > 0 && !validé ? couleur : '#ccc',
-            color: 'white', border: 'none',
-            fontSize: '1rem', cursor: nbCochés > 0 && !validé ? 'pointer' : 'not-allowed',
-            fontWeight: 'bold', whiteSpace: 'nowrap'
+          padding: '12px 20px', borderRadius: '8px',
+          background: nbCochés > 0 ? couleur : '#ccc',
+          color: 'white', border: 'none',
+          fontSize: '1rem', cursor: nbCochés > 0 ? 'pointer' : 'not-allowed',
+          fontWeight: 'bold', whiteSpace: 'nowrap'
           }}
-        >
-          {validé ? '✅ Validé !' : `Prendre (${nbCochés})`}
+         >    
+         {`Prendre (${nbCochés})`}
         </button>
       </div>
 
