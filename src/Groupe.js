@@ -109,7 +109,7 @@ export default function Groupe({ groupeId, nom, couleur }) {
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '16px', fontFamily: 'Arial', boxSizing: 'border-box' }}>
 
       {/* Header */}
-      <h1 style={{ color: couleur, textAlign: 'center', marginBottom: '4px', fontSize: 'clamp(1.2rem, 4vw, 1.8rem)' }}>
+      <h1 style={{ color: couleur, textAlign: 'center', marginBottom: '4px', fontSize: 'clamp(1.1rem, 4vw, 1.8rem)' }}>
         📖 {nom}
       </h1>
       <p style={{ textAlign: 'center', color: '#888', marginTop: 0, fontSize: '0.9rem' }}>
@@ -153,7 +153,7 @@ export default function Groupe({ groupeId, nom, couleur }) {
         </button>
       </div>
 
-      {/* Grille responsive */}
+      {/* Grille 5 colonnes */}
       {loading ? (
         <p style={{ textAlign: 'center' }}>Chargement...</p>
       ) : (
@@ -171,48 +171,59 @@ export default function Groupe({ groupeId, nom, couleur }) {
                 borderRadius: '10px',
                 border: `2px solid ${pritPar ? couleur : coché ? couleur : '#e0e0e0'}`,
                 background: pritPar ? `${couleur}22` : coché ? `${couleur}11` : 'white',
-                padding: '8px 4px',
-                textAlign: 'center',
+                padding: '8px 6px',
                 transition: 'all 0.2s'
               }}>
-                {/* Numéro cliquable */}
-                <div
-                  onClick={() => setSelected(num)}
-                  style={{
-                    fontWeight: 'bold', color: couleur,
-                    cursor: 'pointer', fontSize: 'clamp(0.8rem, 2.5vw, 1rem)',
-                    textDecoration: 'underline', marginBottom: '5px'
-                  }}
-                >
-                  {num}
-                </div>
+                {/* Ligne : numéro + case + prénom */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
 
-                {/* Case à cocher */}
-                <div
-                  onClick={() => toggleCoché(num)}
-                  style={{
-                    width: '22px', height: '22px',
-                    borderRadius: '4px', margin: '0 auto 5px',
-                    border: `2px solid ${pritPar ? couleur : coché ? couleur : '#bbb'}`,
-                    background: pritPar ? couleur : coché ? couleur : 'white',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    cursor: pritPar ? 'not-allowed' : 'pointer',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  {(pritPar || coché) && (
-                    <span style={{ color: 'white', fontSize: '13px', fontWeight: 'bold' }}>✓</span>
-                  )}
-                </div>
+                  {/* Numéro cliquable */}
+                  <span
+                    onClick={() => setSelected(num)}
+                    style={{
+                      fontWeight: '900',
+                      color: couleur,
+                      cursor: 'pointer',
+                      fontSize: 'clamp(0.75rem, 2.5vw, 0.95rem)',
+                      textDecoration: 'underline',
+                      textDecorationThickness: '2px',
+                      minWidth: '22px',
+                      flexShrink: 0
+                    }}
+                  >
+                    {num}
+                  </span>
 
-                {/* Prénom */}
-                <div style={{
-                  fontSize: 'clamp(0.55rem, 1.8vw, 0.7rem)',
-                  color: pritPar ? couleur : '#bbb',
-                  minHeight: '12px',
-                  wordBreak: 'break-word'
-                }}>
-                  {pritPar || ''}
+                  {/* Case à cocher */}
+                  <div
+                    onClick={() => toggleCoché(num)}
+                    style={{
+                      width: '18px', height: '18px',
+                      borderRadius: '4px', flexShrink: 0,
+                      border: `2px solid ${pritPar ? couleur : coché ? couleur : '#bbb'}`,
+                      background: pritPar ? couleur : coché ? couleur : 'white',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      cursor: pritPar ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    {(pritPar || coché) && (
+                      <span style={{ color: 'white', fontSize: '11px', fontWeight: 'bold' }}>✓</span>
+                    )}
+                  </div>
+
+                  {/* Prénom */}
+                  <span style={{
+                    fontSize: 'clamp(0.5rem, 1.8vw, 0.65rem)',
+                    color: pritPar ? couleur : '#bbb',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    flex: 1
+                  }}>
+                    {pritPar || ''}
+                  </span>
+
                 </div>
               </div>
             );
