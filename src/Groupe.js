@@ -137,17 +137,28 @@ export default function Groupe({ groupeId, nom, couleur }) {
         }} />
       </div>
 
-      {/* Bouton prendre */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+      {/* Prénom + bouton prendre */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
+        <input
+          type="text"
+          placeholder="✍️ Ton prénom"
+          value={prenom}
+          onChange={e => { setPrenom(e.target.value); setValidé(false); }}
+          style={{
+            padding: '12px 16px', borderRadius: '8px',
+            border: `2px solid ${couleur}`, fontSize: '1rem',
+            flex: '1', minWidth: '160px', maxWidth: '250px'
+          }}
+        />
         <button
           onClick={valider}
           disabled={nbCochés === 0 || validé}
           style={{
-            padding: '12px 32px', borderRadius: '8px',
+            padding: '12px 20px', borderRadius: '8px',
             background: nbCochés > 0 && !validé ? couleur : '#ccc',
             color: 'white', border: 'none',
             fontSize: '1rem', cursor: nbCochés > 0 && !validé ? 'pointer' : 'not-allowed',
-            fontWeight: 'bold'
+            fontWeight: 'bold', whiteSpace: 'nowrap'
           }}
         >
           {validé ? '✅ Validé !' : `Prendre (${nbCochés})`}
