@@ -24,44 +24,51 @@ function PopupTehilim({ nums, couleur, onClose }) {
   return (
     <div style={{
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-      background: 'white', zIndex: 1000,
-      overflowY: 'auto', padding: '16px',
-      boxSizing: 'border-box'
+      background: 'rgba(0,0,0,0.75)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 1000, padding: '10px'
     }}>
-      {nums.map(num => (
-        <div key={num} style={{ marginBottom: '40px' }}>
-          <h2 style={{
-            color: couleur, textAlign: 'center',
-            fontSize: 'clamp(1rem, 3vw, 1.3rem)',
-            marginBottom: '12px'
-          }}>
-            פרק {num} — Chapitre {num}
-          </h2>
-          <div style={{
-            direction: 'rtl', textAlign: 'right',
-            fontSize: 'clamp(1.3rem, 5vw, 1.8rem)',
-            lineHeight: '2',
-            color: '#1a1a2e', padding: '12px',
-            background: '#f8f8ff', borderRadius: '10px',
-            fontFamily: 'Times New Roman, serif',
-            wordBreak: 'break-word',
-            boxSizing: 'border-box'
-          }}>
-            {textes[num] || 'Chargement...'}
-          </div>
-          <hr style={{ margin: '30px 0', border: 'none', borderTop: '2px solid #eee' }} />
-        </div>
-      ))}
-
-      <button onClick={onClose} style={{
-        padding: '14px', background: couleur,
-        color: 'white', border: 'none',
-        borderRadius: '8px', fontSize: '1rem',
-        cursor: 'pointer', width: '100%',
-        marginTop: '10px', boxSizing: 'border-box'
+      <div style={{
+        background: 'white', borderRadius: '16px',
+        padding: '16px', width: '100%', maxWidth: '650px',
+        maxHeight: '90vh', overflowY: 'auto',
+        boxSizing: 'border-box'
       }}>
-        ✕ Fermer
-      </button>
+        {nums.map(num => (
+          <div key={num} style={{ marginBottom: '40px' }}>
+            <h2 style={{
+              color: couleur, textAlign: 'center',
+              fontSize: 'clamp(1rem, 3vw, 1.3rem)',
+              marginBottom: '12px'
+            }}>
+              פרק {num} — Chapitre {num}
+            </h2>
+            <div style={{
+              direction: 'rtl', textAlign: 'right',
+              fontSize: 'clamp(1.3rem, 5vw, 1.8rem)',
+              lineHeight: '2',
+              color: '#1a1a2e', padding: '12px',
+              background: '#f8f8ff', borderRadius: '10px',
+              fontFamily: 'Times New Roman, serif',
+              wordBreak: 'break-word',
+              boxSizing: 'border-box'
+            }}>
+              {textes[num] || 'Chargement...'}
+            </div>
+            <hr style={{ margin: '30px 0', border: 'none', borderTop: '2px solid #eee' }} />
+          </div>
+        ))}
+
+        <button onClick={onClose} style={{
+          padding: '14px', background: couleur,
+          color: 'white', border: 'none',
+          borderRadius: '8px', fontSize: '1rem',
+          cursor: 'pointer', width: '100%',
+          boxSizing: 'border-box'
+        }}>
+          ✕ Fermer
+        </button>
+      </div>
     </div>
   );
 }
@@ -74,6 +81,7 @@ export default function Groupe({ groupeId, nom, couleur }) {
   const [loading, setLoading] = useState(true);
   const [cochés, setCochés] = useState({});
   const [demandePrenom, setDemandePrenom] = useState(false);
+  const [mesChapitres, setMesChapitres] = useState([]);
 
   const docId = `${groupeId}_${getTodayKey()}`;
 
@@ -93,13 +101,14 @@ export default function Groupe({ groupeId, nom, couleur }) {
   }
 
   async function confirmerAvecPrenom(p) {
-    const choix = Object.keys(cochés).filter(k => cochés[k]);
+    const choix = Object.keys(cochés).filter(k => cochés[k]).map(Number).sort((a, b) => a - b);
     const ref = doc(db, 'lectures', docId);
     const snap = await getDoc(ref);
     const data = snap.exists() ? snap.data().chapitres : {};
     choix.forEach(num => { if (!data[num]) data[num] = p; });
     await setDoc(ref, { chapitres: data }, { merge: false });
     setPrenom(p);
+    setMesChapitres(prev => [...new Set([...prev, ...choix])].sort((a, b) => a - b));
     setCochés({});
     setDemandePrenom(false);
     setPrenomTemp('');
@@ -116,13 +125,8 @@ export default function Groupe({ groupeId, nom, couleur }) {
   }
 
   function ouvrirLecture(num) {
-    const choixCochés = Object.keys(cochés)
-      .filter(k => cochés[k])
-      .map(Number)
-      .sort((a, b) => a - b);
-
-    if (choixCochés.includes(num)) {
-      setSelected(choixCochés);
+    if (mesChapitres.includes(num)) {
+      setSelected(mesChapitres);
     } else {
       setSelected([num]);
     }
