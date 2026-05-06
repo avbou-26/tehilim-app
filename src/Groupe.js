@@ -81,7 +81,6 @@ export default function Groupe({ groupeId, nom, couleur }) {
   const [loading, setLoading] = useState(true);
   const [cochés, setCochés] = useState({});
   const [demandePrenom, setDemandePrenom] = useState(false);
-  const [mesChapitres, setMesChapitres] = useState([]);
 
   const docId = `${groupeId}_${getTodayKey()}`;
 
@@ -108,7 +107,6 @@ export default function Groupe({ groupeId, nom, couleur }) {
     choix.forEach(num => { if (!data[num]) data[num] = p; });
     await setDoc(ref, { chapitres: data }, { merge: false });
     setPrenom(p);
-    setMesChapitres(prev => [...new Set([...prev, ...choix])].sort((a, b) => a - b));
     setCochés({});
     setDemandePrenom(false);
     setPrenomTemp('');
@@ -125,8 +123,13 @@ export default function Groupe({ groupeId, nom, couleur }) {
   }
 
   function ouvrirLecture(num) {
-    if (mesChapitres.includes(num)) {
-      setSelected(mesChapitres);
+    const pritPar = chapitres[num];
+    if (pritPar) {
+      const sesChapitres = Object.keys(chapitres)
+        .filter(k => chapitres[k] === pritPar)
+        .map(Number)
+        .sort((a, b) => a - b);
+      setSelected(sesChapitres);
     } else {
       setSelected([num]);
     }
