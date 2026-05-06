@@ -28,17 +28,6 @@ function PopupTehilim({ nums, couleur, onClose }) {
       overflowY: 'auto', padding: '16px',
       boxSizing: 'border-box'
     }}>
-      <button onClick={onClose} style={{
-        position: 'sticky', top: 0,
-        padding: '10px', background: couleur,
-        color: 'white', border: 'none',
-        borderRadius: '8px', fontSize: '1rem',
-        cursor: 'pointer', width: '100%',
-        marginBottom: '20px', zIndex: 10
-      }}>
-        ✕ Fermer
-      </button>
-
       {nums.map(num => (
         <div key={num} style={{ marginBottom: '40px' }}>
           <h2 style={{
@@ -63,6 +52,16 @@ function PopupTehilim({ nums, couleur, onClose }) {
           <hr style={{ margin: '30px 0', border: 'none', borderTop: '2px solid #eee' }} />
         </div>
       ))}
+
+      <button onClick={onClose} style={{
+        padding: '14px', background: couleur,
+        color: 'white', border: 'none',
+        borderRadius: '8px', fontSize: '1rem',
+        cursor: 'pointer', width: '100%',
+        marginTop: '10px', boxSizing: 'border-box'
+      }}>
+        ✕ Fermer
+      </button>
     </div>
   );
 }
@@ -117,7 +116,11 @@ export default function Groupe({ groupeId, nom, couleur }) {
   }
 
   function ouvrirLecture(num) {
-    const choixCochés = Object.keys(cochés).filter(k => cochés[k]).map(Number).sort((a, b) => a - b);
+    const choixCochés = Object.keys(cochés)
+      .filter(k => cochés[k])
+      .map(Number)
+      .sort((a, b) => a - b);
+
     if (choixCochés.includes(num)) {
       setSelected(choixCochés);
     } else {
@@ -135,7 +138,6 @@ export default function Groupe({ groupeId, nom, couleur }) {
       boxSizing: 'border-box', width: '100%'
     }}>
 
-      {/* Header */}
       <h1 style={{
         color: couleur, textAlign: 'center',
         marginBottom: '4px',
@@ -147,7 +149,6 @@ export default function Groupe({ groupeId, nom, couleur }) {
         {pris}/150 chapitres pris
       </p>
 
-      {/* Barre de progression */}
       <div style={{ background: '#eee', borderRadius: '10px', height: '10px', margin: '8px 0 16px' }}>
         <div style={{
           width: `${(pris / 150) * 100}%`,
@@ -156,7 +157,6 @@ export default function Groupe({ groupeId, nom, couleur }) {
         }} />
       </div>
 
-      {/* Prénom + bouton prendre */}
       <div style={{
         display: 'flex', justifyContent: 'center',
         gap: '8px', marginBottom: '16px', flexWrap: 'wrap'
@@ -189,7 +189,6 @@ export default function Groupe({ groupeId, nom, couleur }) {
         </button>
       </div>
 
-      {/* Grille */}
       {loading ? (
         <p style={{ textAlign: 'center' }}>Chargement...</p>
       ) : (
@@ -213,7 +212,6 @@ export default function Groupe({ groupeId, nom, couleur }) {
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
 
-                  {/* Numéro cliquable */}
                   <span
                     onClick={() => ouvrirLecture(num)}
                     style={{
@@ -230,7 +228,6 @@ export default function Groupe({ groupeId, nom, couleur }) {
                     {num}
                   </span>
 
-                  {/* Case à cocher */}
                   <div
                     onClick={() => toggleCoché(num)}
                     style={{
@@ -248,7 +245,6 @@ export default function Groupe({ groupeId, nom, couleur }) {
                     )}
                   </div>
 
-                  {/* Prénom */}
                   <span style={{
                     fontSize: 'clamp(0.55rem, 2vw, 0.65rem)',
                     color: pritPar ? couleur : '#bbb',
@@ -267,7 +263,6 @@ export default function Groupe({ groupeId, nom, couleur }) {
         </div>
       )}
 
-      {/* Popup demande prénom */}
       {demandePrenom && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
@@ -320,7 +315,6 @@ export default function Groupe({ groupeId, nom, couleur }) {
         </div>
       )}
 
-      {/* Popup tehilim */}
       {selected && (
         <PopupTehilim
           nums={selected}
