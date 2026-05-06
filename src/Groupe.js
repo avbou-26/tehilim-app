@@ -99,11 +99,33 @@ export default function Groupe({ groupeId, nom, couleur }) {
     setCochés(prev => ({ ...prev, [num]: !prev[num] }));
   }
 
+  function prenomDejaUtilise(p) {
+    return Object.values(chapitres).some(
+      v => v.toLowerCase() === p.toLowerCase()
+    );
+  }
+
   async function confirmerAvecPrenom(p) {
+    // Vérifie si le prénom est déjà utilisé
+    if (prenomDejaUtilise(p)) {
+      alert(`Le prénom "${p}" est déjà pris ! Choisis un autre prénom.`);
+      return;
+    }
+
     const choix = Object.keys(cochés).filter(k => cochés[k]).map(Number).sort((a, b) => a - b);
     const ref = doc(db, 'lectures', docId);
     const snap = await getDoc(ref);
     const data = snap.exists() ? snap.data().chapitres : {};
+
+    // Vérifie encore une fois au moment d'écrire
+    const prenomPrisAuDernier = Object.values(data).some(
+      v => v.toLowerCase() === p.toLowerCase()
+    );
+    if (prenomPrisAuDernier) {
+      alert(`Le prénom "${p}" est déjà pris ! Choisis un autre prénom.`);
+      return;
+    }
+
     choix.forEach(num => { if (!data[num]) data[num] = p; });
     await setDoc(ref, { chapitres: data }, { merge: false });
     setPrenom(p);
