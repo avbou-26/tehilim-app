@@ -10,41 +10,44 @@ function getTodayKey() {
 
 const isMobile = window.innerWidth < 600;
 
-function PopupTehilim({ num, couleur, onClose }) {
-  const [texte, setTexte] = useState({ he: '' });
-  const [loading, setLoading] = useState(true);
+function PopupTehilim({ nums, couleur, onClose }) {
+  const [textes, setTextes] = useState({});
 
   useEffect(() => {
-    getTehilim(num).then((t) => {
-      setTexte(t);
-      setLoading(false);
+    nums.forEach(num => {
+      getTehilim(num).then(t => {
+        setTextes(prev => ({ ...prev, [num]: t.he }));
+      });
     });
-  }, [num]);
+  }, [nums]);
 
   return (
     <div style={{
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-      background: 'rgba(0,0,0,0.75)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      zIndex: 1000, padding: '10px',
+      background: 'white', zIndex: 1000,
+      overflowY: 'auto', padding: '16px',
       boxSizing: 'border-box'
     }}>
-      <div style={{
-        background: 'white', borderRadius: '16px',
-        padding: '16px', width: '100%', maxWidth: '650px',
-        maxHeight: '90vh', overflowY: 'auto',
-        boxSizing: 'border-box'
+      <button onClick={onClose} style={{
+        position: 'sticky', top: 0,
+        padding: '10px', background: couleur,
+        color: 'white', border: 'none',
+        borderRadius: '8px', fontSize: '1rem',
+        cursor: 'pointer', width: '100%',
+        marginBottom: '20px', zIndex: 10
       }}>
-        <h2 style={{
-          color: couleur, textAlign: 'center',
-          fontFamily: 'Arial', fontSize: 'clamp(1rem, 3vw, 1.2rem)',
-          margin: '0 0 12px 0'
-        }}>
-          פרק {num} — Chapitre {num}
-        </h2>
-        {loading ? (
-          <p style={{ textAlign: 'center' }}>Chargement...</p>
-        ) : (
+        ✕ Fermer
+      </button>
+
+      {nums.map(num => (
+        <div key={num} style={{ marginBottom: '40px' }}>
+          <h2 style={{
+            color: couleur, textAlign: 'center',
+            fontSize: 'clamp(1rem, 3vw, 1.3rem)',
+            marginBottom: '12px'
+          }}>
+            פרק {num} — Chapitre {num}
+          </h2>
           <div style={{
             direction: 'rtl', textAlign: 'right',
             fontSize: 'clamp(1.3rem, 5vw, 1.8rem)',
@@ -55,19 +58,11 @@ function PopupTehilim({ num, couleur, onClose }) {
             wordBreak: 'break-word',
             boxSizing: 'border-box'
           }}>
-            {texte.he}
+            {textes[num] || 'Chargement...'}
           </div>
-        )}
-        <button onClick={onClose} style={{
-          marginTop: '14px', padding: '12px',
-          background: couleur, color: 'white',
-          border: 'none', borderRadius: '8px',
-          fontSize: '1rem', cursor: 'pointer',
-          width: '100%', boxSizing: 'border-box'
-        }}>
-          ✕ Fermer
-        </button>
-      </div>
+          <hr style={{ margin: '30px 0', border: 'none', borderTop: '2px solid #eee' }} />
+        </div>
+      ))}
     </div>
   );
 }
@@ -119,6 +114,15 @@ export default function Groupe({ groupeId, nom, couleur }) {
       return;
     }
     await confirmerAvecPrenom(prenom.trim());
+  }
+
+  function ouvrirLecture(num) {
+    const choixCochés = Object.keys(cochés).filter(k => cochés[k]).map(Number).sort((a, b) => a - b);
+    if (choixCochés.includes(num)) {
+      setSelected(choixCochés);
+    } else {
+      setSelected([num]);
+    }
   }
 
   const pris = Object.keys(chapitres).length;
@@ -185,7 +189,7 @@ export default function Groupe({ groupeId, nom, couleur }) {
         </button>
       </div>
 
-      {/* Grille : 3 colonnes mobile, 5 colonnes PC */}
+      {/* Grille */}
       {loading ? (
         <p style={{ textAlign: 'center' }}>Chargement...</p>
       ) : (
@@ -211,7 +215,7 @@ export default function Groupe({ groupeId, nom, couleur }) {
 
                   {/* Numéro cliquable */}
                   <span
-                    onClick={() => setSelected(num)}
+                    onClick={() => ouvrirLecture(num)}
                     style={{
                       fontWeight: '900',
                       color: couleur,
@@ -318,7 +322,11 @@ export default function Groupe({ groupeId, nom, couleur }) {
 
       {/* Popup tehilim */}
       {selected && (
-        <PopupTehilim num={selected} couleur={couleur} onClose={() => setSelected(null)} />
+        <PopupTehilim
+          nums={selected}
+          couleur={couleur}
+          onClose={() => setSelected(null)}
+        />
       )}
     </div>
   );
