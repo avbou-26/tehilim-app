@@ -47,7 +47,7 @@ function PopupTehilim({ num, couleur, onClose }) {
         ) : (
           <div style={{
             direction: 'rtl', textAlign: 'right',
-            fontSize: 'clamp(0.85rem, 3vw, 1.2rem)',
+            fontSize: 'clamp(1.1rem, 4vw, 1.5rem)',
             lineHeight: '2',
             color: '#1a1a2e', padding: '12px',
             background: '#f8f8ff', borderRadius: '10px',
