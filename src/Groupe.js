@@ -10,6 +10,42 @@ function getTodayKey() {
 
 const isMobile = window.innerWidth < 600;
 
+function PopupValidé({ couleur }) {
+  const [phase, setPhase] = useState(0);
+
+  useEffect(() => {
+    setTimeout(() => setPhase(1), 50);
+    setTimeout(() => setPhase(2), 350);
+    setTimeout(() => setPhase(3), 550);
+    setTimeout(() => setPhase(4), 1500);
+  }, []);
+
+  const scales = [0, 1.3, 0.9, 1, 0];
+  const scale = scales[phase];
+
+  if (phase === 4) return null;
+
+  return (
+    <div style={{
+      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 3000, pointerEvents: 'none'
+    }}>
+      <div style={{
+        width: '110px', height: '110px',
+        borderRadius: '50%',
+        background: couleur,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        transform: `scale(${scale})`,
+        transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.25)'
+      }}>
+        <span style={{ fontSize: '3.5rem', color: 'white' }}>✓</span>
+      </div>
+    </div>
+  );
+}
+
 function PopupTehilim({ nums, couleur, onClose }) {
   const [textes, setTextes] = useState({});
 
@@ -67,63 +103,6 @@ function PopupTehilim({ nums, couleur, onClose }) {
         }}>
           ✕ Fermer
         </button>
-      </div>
-    </div>
-  );
-}
-
-function PopupValidé({ couleur }) {
-  const [phase, setPhase] = useState(0);
-
-  useEffect(() => {
-    setTimeout(() => setPhase(1), 50);   // pop
-    setTimeout(() => setPhase(2), 350);  // rebond
-    setTimeout(() => setPhase(3), 550);  // stable
-    setTimeout(() => setPhase(4), 1500); // disparait
-  }, []);
-
-  const scales = [0, 1.3, 0.9, 1, 0];
-  const scale = scales[phase];
-
-  if (phase === 4) return null;
-
-  return (
-    <div style={{
-      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      zIndex: 3000, pointerEvents: 'none'
-    }}>
-      <div style={{
-        width: '110px', height: '110px',
-        borderRadius: '50%',
-        background: couleur,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        transform: `scale(${scale})`,
-        transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.25)'
-      }}>
-        <span style={{ fontSize: '3.5rem', color: 'white' }}>✓</span>
-      </div>
-    </div>
-  );
-}
-
-  return (
-    <div style={{
-      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      zIndex: 3000, pointerEvents: 'none'
-    }}>
-      <div style={{
-        width: '100px', height: '100px',
-        borderRadius: '50%',
-        background: couleur,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        transform: `scale(${scale})`,
-        transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
-      }}>
-        <span style={{ fontSize: '3rem' }}>✓</span>
       </div>
     </div>
   );
@@ -297,18 +276,15 @@ export default function Groupe({ groupeId, nom, couleur }) {
                 boxSizing: 'border-box'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-
                   <span
                     onClick={() => ouvrirLecture(num)}
                     style={{
-                      fontWeight: '900',
-                      color: couleur,
+                      fontWeight: '900', color: couleur,
                       cursor: 'pointer',
                       fontSize: 'clamp(0.8rem, 3vw, 0.95rem)',
                       textDecoration: 'underline',
                       textDecorationThickness: '2px',
-                      minWidth: '24px',
-                      flexShrink: 0
+                      minWidth: '24px', flexShrink: 0
                     }}
                   >
                     {num}
@@ -334,14 +310,11 @@ export default function Groupe({ groupeId, nom, couleur }) {
                   <span style={{
                     fontSize: 'clamp(0.55rem, 2vw, 0.65rem)',
                     color: pritPar ? couleur : '#bbb',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    flex: 1
+                    overflow: 'hidden', textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap', flex: 1
                   }}>
                     {pritPar || ''}
                   </span>
-
                 </div>
               </div>
             );
