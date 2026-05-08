@@ -73,16 +73,40 @@ function PopupTehilim({ nums, couleur, onClose }) {
 }
 
 function PopupValidé({ couleur }) {
-  const [visible, setVisible] = useState(true);
-  const [scale, setScale] = useState(0);
+  const [phase, setPhase] = useState(0);
 
   useEffect(() => {
-    setTimeout(() => setScale(1), 50);
-    setTimeout(() => setScale(0), 1500);
-    setTimeout(() => setVisible(false), 2000);
+    setTimeout(() => setPhase(1), 50);   // pop
+    setTimeout(() => setPhase(2), 350);  // rebond
+    setTimeout(() => setPhase(3), 550);  // stable
+    setTimeout(() => setPhase(4), 1500); // disparait
   }, []);
 
-  if (!visible) return null;
+  const scales = [0, 1.3, 0.9, 1, 0];
+  const scale = scales[phase];
+
+  if (phase === 4) return null;
+
+  return (
+    <div style={{
+      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 3000, pointerEvents: 'none'
+    }}>
+      <div style={{
+        width: '110px', height: '110px',
+        borderRadius: '50%',
+        background: couleur,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        transform: `scale(${scale})`,
+        transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.25)'
+      }}>
+        <span style={{ fontSize: '3.5rem', color: 'white' }}>✓</span>
+      </div>
+    </div>
+  );
+}
 
   return (
     <div style={{
