@@ -58,7 +58,6 @@ function PopupTehilim({ nums, couleur, onClose }) {
             <hr style={{ margin: '30px 0', border: 'none', borderTop: '2px solid #eee' }} />
           </div>
         ))}
-
         <button onClick={onClose} style={{
           padding: '14px', background: couleur,
           color: 'white', border: 'none',
@@ -73,6 +72,39 @@ function PopupTehilim({ nums, couleur, onClose }) {
   );
 }
 
+function PopupValidé({ couleur }) {
+  const [visible, setVisible] = useState(true);
+  const [scale, setScale] = useState(0);
+
+  useEffect(() => {
+    setTimeout(() => setScale(1), 50);
+    setTimeout(() => setScale(0), 1500);
+    setTimeout(() => setVisible(false), 2000);
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <div style={{
+      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 3000, pointerEvents: 'none'
+    }}>
+      <div style={{
+        width: '100px', height: '100px',
+        borderRadius: '50%',
+        background: couleur,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        transform: `scale(${scale})`,
+        transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+      }}>
+        <span style={{ fontSize: '3rem' }}>✓</span>
+      </div>
+    </div>
+  );
+}
+
 export default function Groupe({ groupeId, nom, couleur }) {
   const [chapitres, setChapitres] = useState({});
   const [prenom, setPrenom] = useState('');
@@ -81,6 +113,7 @@ export default function Groupe({ groupeId, nom, couleur }) {
   const [loading, setLoading] = useState(true);
   const [cochés, setCochés] = useState({});
   const [demandePrenom, setDemandePrenom] = useState(false);
+  const [showValidé, setShowValidé] = useState(false);
 
   const docId = `${groupeId}_${getTodayKey()}`;
 
@@ -106,7 +139,6 @@ export default function Groupe({ groupeId, nom, couleur }) {
   }
 
   async function confirmerAvecPrenom(p) {
-    // Vérifie si le prénom est déjà utilisé
     if (prenomDejaUtilise(p)) {
       alert(`Le prénom "${p}" est déjà pris ! Choisis un autre prénom.`);
       return;
@@ -117,7 +149,6 @@ export default function Groupe({ groupeId, nom, couleur }) {
     const snap = await getDoc(ref);
     const data = snap.exists() ? snap.data().chapitres : {};
 
-    // Vérifie encore une fois au moment d'écrire
     const prenomPrisAuDernier = Object.values(data).some(
       v => v.toLowerCase() === p.toLowerCase()
     );
@@ -128,10 +159,12 @@ export default function Groupe({ groupeId, nom, couleur }) {
 
     choix.forEach(num => { if (!data[num]) data[num] = p; });
     await setDoc(ref, { chapitres: data }, { merge: false });
-    setPrenom(p);
+    setPrenom('');
     setCochés({});
     setDemandePrenom(false);
     setPrenomTemp('');
+    setShowValidé(true);
+    setTimeout(() => setShowValidé(false), 2100);
   }
 
   async function valider() {
@@ -343,6 +376,8 @@ export default function Groupe({ groupeId, nom, couleur }) {
           </div>
         </div>
       )}
+
+      {showValidé && <PopupValidé couleur={couleur} />}
 
       {selected && (
         <PopupTehilim
