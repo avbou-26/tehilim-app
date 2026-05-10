@@ -1,0 +1,8 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#1a1a2e"/>
+  <rect x="60" y="60" width="1080" height="510" rx="20" fill="#16213e"/>
+  <rect x="100" y="100" width="1000" height="430" rx="12" fill="#0f3460" opacity="0.5"/>
+  <text x="600" y="360" text-anchor="middle" font-family="Times New Roman, serif" font-size="200" fill="#e2c97e" font-weight="400">תהילים</text>
+  <text x="600" y="450" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" fill="#a0a8c0" font-weight="400" letter-spacing="12">TEHILIM</text>
+  <rect x="500" y="475" width="200" height="3" rx="1" fill="#e2c97e" opacity="0.5"/>
+</svg>
