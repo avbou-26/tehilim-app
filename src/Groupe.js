@@ -135,12 +135,14 @@ export default function Groupe({ groupeId, nom, couleur }) {
     setCochés(prev => ({ ...prev, [num]: !prev[num] }));
   }
 
+  const PRENOMS_MULTIPLES = ['Chalva', 'Avraham'];
+
   function prenomDejaUtilise(p) {
+    if (PRENOMS_MULTIPLES.includes(p.toLowerCase())) return false;
     return Object.values(chapitres).some(
       v => v.toLowerCase() === p.toLowerCase()
     );
   }
-
   async function confirmerAvecPrenom(p) {
     if (prenomDejaUtilise(p)) {
       alert(`Le prénom "${p}" est déjà pris ! Choisis un autre prénom.`);
