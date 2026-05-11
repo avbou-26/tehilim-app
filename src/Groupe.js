@@ -135,7 +135,7 @@ export default function Groupe({ groupeId, nom, couleur }) {
     setCochés(prev => ({ ...prev, [num]: !prev[num] }));
   }
 
-  const PRENOMS_MULTIPLES = ['Chalva', 'Avraham'];
+  const PRENOMS_MULTIPLES = ['chalva', 'Chalva', 'avraham', 'Avraham'];
 
   function prenomDejaUtilise(p) {
     if (PRENOMS_MULTIPLES.includes(p.toLowerCase())) return false;
