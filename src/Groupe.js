@@ -23,7 +23,6 @@ function PopupValidé({ couleur }) {
 
   const scales = [0, 1.3, 0.9, 1, 0];
   const scale = scales[phase];
-
   if (phase === 4) return null;
 
   return (
@@ -33,8 +32,7 @@ function PopupValidé({ couleur }) {
       zIndex: 3000, pointerEvents: 'none'
     }}>
       <div style={{
-        width: '110px', height: '110px',
-        borderRadius: '50%',
+        width: '110px', height: '110px', borderRadius: '50%',
         background: couleur,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         transform: `scale(${scale})`,
@@ -47,16 +45,17 @@ function PopupValidé({ couleur }) {
   );
 }
 
-function PopupTehilim({ nums, couleur, onClose }) {
+function PopupTehilim({ nums, couleur, groupeId, onClose }) {
   const [textes, setTextes] = useState({});
 
   useEffect(() => {
     nums.forEach(num => {
-      getTehilim(num).then(t => {
-        setTextes(prev => ({ ...prev, [num]: t.he }));
+      const avecFr = groupeId === 'tehilim' && num >= 31 && num <= 45;
+      getTehilim(num, avecFr).then(t => {
+        setTextes(prev => ({ ...prev, [num]: t }));
       });
     });
-  }, [nums]);
+  }, [nums, groupeId]);
 
   return (
     <div style={{
@@ -80,27 +79,42 @@ function PopupTehilim({ nums, couleur, onClose }) {
             }}>
               פרק {num} — Chapitre {num}
             </h2>
+
+            {/* Texte hébreu */}
             <div style={{
               direction: 'rtl', textAlign: 'right',
               fontSize: 'clamp(1.3rem, 5vw, 1.8rem)',
-              lineHeight: '2',
-              color: '#1a1a2e', padding: '12px',
+              lineHeight: '2', color: '#1a1a2e', padding: '12px',
               background: '#f8f8ff', borderRadius: '10px',
               fontFamily: 'Times New Roman, serif',
-              wordBreak: 'break-word',
-              boxSizing: 'border-box'
+              wordBreak: 'break-word', boxSizing: 'border-box'
             }}>
-              {textes[num] || 'Chargement...'}
+              {textes[num]?.he || 'Chargement...'}
             </div>
+
+            {/* Traduction française si disponible */}
+            {textes[num]?.fr && (
+              <div style={{
+                marginTop: '12px',
+                fontSize: 'clamp(0.9rem, 2.5vw, 1rem)',
+                lineHeight: '1.8', color: '#333', padding: '12px',
+                background: '#fffdf0', borderRadius: '10px',
+                borderLeft: `4px solid ${couleur}`,
+                boxSizing: 'border-box'
+              }}>
+                {textes[num].fr}
+              </div>
+            )}
+
             <hr style={{ margin: '30px 0', border: 'none', borderTop: '2px solid #eee' }} />
           </div>
         ))}
+
         <button onClick={onClose} style={{
           padding: '14px', background: couleur,
-          color: 'white', border: 'none',
-          borderRadius: '8px', fontSize: '1rem',
-          cursor: 'pointer', width: '100%',
-          boxSizing: 'border-box'
+          color: 'white', border: 'none', borderRadius: '8px',
+          fontSize: '1rem', cursor: 'pointer',
+          width: '100%', boxSizing: 'border-box'
         }}>
           ✕ Fermer
         </button>
@@ -199,8 +213,7 @@ export default function Groupe({ groupeId, nom, couleur }) {
 
       <h1 style={{
         color: couleur, textAlign: 'center',
-        marginBottom: '4px',
-        fontSize: 'clamp(1rem, 4vw, 1.8rem)'
+        marginBottom: '4px', fontSize: 'clamp(1rem, 4vw, 1.8rem)'
       }}>
         📖 {nom}
       </h1>
@@ -238,8 +251,7 @@ export default function Groupe({ groupeId, nom, couleur }) {
           style={{
             padding: '10px 18px', borderRadius: '8px',
             background: nbCochés > 0 ? couleur : '#ccc',
-            color: 'white', border: 'none',
-            fontSize: '1rem',
+            color: 'white', border: 'none', fontSize: '1rem',
             cursor: nbCochés > 0 ? 'pointer' : 'not-allowed',
             fontWeight: 'bold', whiteSpace: 'nowrap'
           }}
@@ -265,19 +277,16 @@ export default function Groupe({ groupeId, nom, couleur }) {
                 borderRadius: '10px',
                 border: `2px solid ${pritPar ? couleur : coché ? couleur : '#e0e0e0'}`,
                 background: pritPar ? `${couleur}22` : coché ? `${couleur}11` : 'white',
-                padding: '8px 6px',
-                transition: 'all 0.2s',
+                padding: '8px 6px', transition: 'all 0.2s',
                 boxSizing: 'border-box'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span
                     onClick={() => ouvrirLecture(num)}
                     style={{
-                      fontWeight: '900', color: couleur,
-                      cursor: 'pointer',
+                      fontWeight: '900', color: couleur, cursor: 'pointer',
                       fontSize: 'clamp(0.8rem, 3vw, 0.95rem)',
-                      textDecoration: 'underline',
-                      textDecorationThickness: '2px',
+                      textDecoration: 'underline', textDecorationThickness: '2px',
                       minWidth: '24px', flexShrink: 0
                     }}
                   >
@@ -287,13 +296,11 @@ export default function Groupe({ groupeId, nom, couleur }) {
                   <div
                     onClick={() => toggleCoché(num)}
                     style={{
-                      width: '20px', height: '20px',
-                      borderRadius: '4px', flexShrink: 0,
+                      width: '20px', height: '20px', borderRadius: '4px', flexShrink: 0,
                       border: `2px solid ${pritPar ? couleur : coché ? couleur : '#bbb'}`,
                       background: pritPar ? couleur : coché ? couleur : 'white',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      cursor: pritPar ? 'not-allowed' : 'pointer',
-                      transition: 'all 0.2s'
+                      cursor: pritPar ? 'not-allowed' : 'pointer', transition: 'all 0.2s'
                     }}
                   >
                     {(pritPar || coché) && (
@@ -374,6 +381,7 @@ export default function Groupe({ groupeId, nom, couleur }) {
         <PopupTehilim
           nums={selected}
           couleur={couleur}
+          groupeId={groupeId}
           onClose={() => setSelected(null)}
         />
       )}
