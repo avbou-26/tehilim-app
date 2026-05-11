@@ -80,7 +80,6 @@ function PopupTehilim({ nums, couleur, groupeId, onClose }) {
               פרק {num} — Chapitre {num}
             </h2>
 
-            {/* Texte hébreu */}
             <div style={{
               direction: 'rtl', textAlign: 'right',
               fontSize: 'clamp(1.3rem, 5vw, 1.8rem)',
@@ -92,7 +91,6 @@ function PopupTehilim({ nums, couleur, groupeId, onClose }) {
               {textes[num]?.he || 'Chargement...'}
             </div>
 
-            {/* Traduction française si disponible */}
             {textes[num]?.fr && (
               <div style={{
                 marginTop: '12px',
@@ -296,7 +294,8 @@ export default function Groupe({ groupeId, nom, couleur }) {
                   <div
                     onClick={() => toggleCoché(num)}
                     style={{
-                      width: '20px', height: '20px', borderRadius: '4px', flexShrink: 0,
+                      width: '20px', height: '20px',
+                      borderRadius: '4px', flexShrink: 0,
                       border: `2px solid ${pritPar ? couleur : coché ? couleur : '#bbb'}`,
                       background: pritPar ? couleur : coché ? couleur : 'white',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
