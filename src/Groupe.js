@@ -9,7 +9,7 @@ function getTodayKey() {
 }
 
 const isMobile = window.innerWidth < 600;
-const PRENOMS_MULTIPLES = ['chalva', 'avraham', 'esther j'];
+const PRENOMS_MULTIPLES = ['chalva', 'avraham', 'esther', 'esther j'];
 
 function PopupValidé({ couleur }) {
   const [phase, setPhase] = useState(0);
