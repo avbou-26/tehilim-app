@@ -9,6 +9,7 @@ function getTodayKey() {
 }
 
 const isMobile = window.innerWidth < 600;
+const PRENOMS_MULTIPLES = ['chalva', 'avraham'];
 
 function PopupValidé({ couleur }) {
   const [phase, setPhase] = useState(0);
@@ -135,15 +136,13 @@ export default function Groupe({ groupeId, nom, couleur }) {
     setCochés(prev => ({ ...prev, [num]: !prev[num] }));
   }
 
- const PRENOMS_MULTIPLES = ['chalva', 'avraham'];
-
-function prenomDejaUtilise(p) {
-  if (PRENOMS_MULTIPLES.includes(p.trim().toLowerCase())) return false;
-  return Object.values(chapitres).some(
-    v => v.toLowerCase() === p.trim().toLowerCase()
-  );
- }
+  function prenomDejaUtilise(p) {
+    if (PRENOMS_MULTIPLES.includes(p.trim().toLowerCase())) return false;
+    return Object.values(chapitres).some(
+      v => v.trim().toLowerCase() === p.trim().toLowerCase()
+    );
   }
+
   async function confirmerAvecPrenom(p) {
     if (prenomDejaUtilise(p)) {
       alert(`Le prénom "${p}" est déjà pris ! Choisis un autre prénom.`);
@@ -154,14 +153,6 @@ function prenomDejaUtilise(p) {
     const ref = doc(db, 'lectures', docId);
     const snap = await getDoc(ref);
     const data = snap.exists() ? snap.data().chapitres : {};
-
-    const prenomPrisAuDernier = Object.values(data).some(
-      v => v.toLowerCase() === p.toLowerCase()
-    );
-    if (prenomPrisAuDernier) {
-      alert(`Le prénom "${p}" est déjà pris ! Choisis un autre prénom.`);
-      return;
-    }
 
     choix.forEach(num => { if (!data[num]) data[num] = p; });
     await setDoc(ref, { chapitres: data }, { merge: false });
@@ -187,7 +178,7 @@ function prenomDejaUtilise(p) {
     const pritPar = chapitres[num];
     if (pritPar) {
       const sesChapitres = Object.keys(chapitres)
-        .filter(k => chapitres[k] === pritPar)
+        .filter(k => chapitres[k].trim().toLowerCase() === pritPar.trim().toLowerCase())
         .map(Number)
         .sort((a, b) => a - b);
       setSelected(sesChapitres);
