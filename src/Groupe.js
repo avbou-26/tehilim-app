@@ -135,13 +135,14 @@ export default function Groupe({ groupeId, nom, couleur }) {
     setCochés(prev => ({ ...prev, [num]: !prev[num] }));
   }
 
-  const PRENOMS_MULTIPLES = ['chalva', 'Chalva', 'avraham', 'Avraham'];
+ const PRENOMS_MULTIPLES = ['chalva', 'avraham'];
 
-  function prenomDejaUtilise(p) {
-    if (PRENOMS_MULTIPLES.includes(p.toLowerCase())) return false;
-    return Object.values(chapitres).some(
-      v => v.toLowerCase() === p.toLowerCase()
-    );
+function prenomDejaUtilise(p) {
+  if (PRENOMS_MULTIPLES.includes(p.trim().toLowerCase())) return false;
+  return Object.values(chapitres).some(
+    v => v.toLowerCase() === p.trim().toLowerCase()
+  );
+ }
   }
   async function confirmerAvecPrenom(p) {
     if (prenomDejaUtilise(p)) {
