@@ -9,7 +9,6 @@ function getTodayKey() {
 }
 
 const isMobile = window.innerWidth < 600;
-const PRENOMS_MULTIPLES = ['chalva', 'avraham', 'esther', 'esther j'];
 
 function PopupValidé({ couleur }) {
   const [phase, setPhase] = useState(0);
@@ -148,19 +147,7 @@ export default function Groupe({ groupeId, nom, couleur }) {
     setCochés(prev => ({ ...prev, [num]: !prev[num] }));
   }
 
-  function prenomDejaUtilise(p) {
-    if (PRENOMS_MULTIPLES.includes(p.trim().toLowerCase())) return false;
-    return Object.values(chapitres).some(
-      v => v.trim().toLowerCase() === p.trim().toLowerCase()
-    );
-  }
-
   async function confirmerAvecPrenom(p) {
-    if (prenomDejaUtilise(p)) {
-      alert(`Le prénom "${p}" est déjà pris ! Choisis un autre prénom.`);
-      return;
-    }
-
     const choix = Object.keys(cochés).filter(k => cochés[k]).map(Number).sort((a, b) => a - b);
     const ref = doc(db, 'lectures', docId);
     const snap = await getDoc(ref);
